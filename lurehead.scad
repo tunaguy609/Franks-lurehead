@@ -30,7 +30,7 @@ eye_z             = 43;     // axial station (from nose) to pocket centre
 extension_length  = 25;
 tube_od           = 25;     // spigot outer diameter (base / straight section)
 tube_id           = 21.5;   // spigot inner bore
-ramp_peak_d       = 25;     // outer diameter at ramp peak
+ramp_peak_d       = 27;     // outer diameter at ramp peak (must be > tube_od to form visible ramp)
 
 ramp1_length      = 12;     // axial length of first ramp section
 ramp_gap          = 1;      // axial return gap from peak back to tube OD
@@ -186,12 +186,23 @@ module sinker_cavity()
 // -----------------------------
 // Central bore through the spigot — removes the core of the
 // extension so it is a tube, not a solid rod.
-// Starts 1 mm inside the head rear face for a clean intersection.
+// Includes a short blend at the head/spigot junction so the
+// inner transition appears smooth and concentric.
 // -----------------------------
 module central_bore()
 {
-    translate([0, 0, head_length - 1])
-        cylinder(d=tube_id, h=extension_length + 2);
+    z0 = head_length;
+    z1 = z0 + ramp1_length;
+    z2 = z1 + ramp_gap;
+    z3 = z2 + ramp2_length;
+
+    // Main straight bore through full spigot region
+    translate([0, 0, z0 - 1])
+        cylinder(d=tube_id, h=(z3 - z0) + 2);
+
+    // Short internal blend from sinker cavity ID to tube ID
+    translate([0, 0, z0 - 1.5])
+        cylinder(h=1.5, d1=sinker_bore, d2=tube_id);
 }
 
 
