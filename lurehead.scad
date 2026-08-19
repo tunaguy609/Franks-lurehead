@@ -38,7 +38,8 @@ transition_start  = 8;
 // EXTERIOR PROFILE
 // x = axial distance from nose
 // r = outside radius
-// Hard edge at rear (28mm diameter)
+// Maintains 28mm max diameter to rear (no taper)
+// Hard edge at rear where extension begins
 // -----------------------------
 module head_profile()
 {
@@ -55,7 +56,7 @@ module head_profile()
             [14.0,45.0],
             [13.6,51.0],
             [12.8,56.0],
-            [11.7,59.5],
+            [12.8,59.5],
             [14.0,62.0],
             [0,62.0]
         ]);
