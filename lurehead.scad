@@ -18,17 +18,20 @@ leader_bore       = 2.5;
 min_wall          = 3.0;
 sinker_bore       = max_diameter - 2*min_wall;  // 22 mm
 
-// Skirt collar and ramps
-collar_length     = 23;    // Total collar length
+// Skirt collar
 collar_od         = 28;    // Outer diameter matches head
 collar_id         = 22;    // Inner bore diameter for egg weight
+collar_length     = 3;     // Collar ring thickness
+
+// Ramped skirt spigot (below collar)
+ramp_base_d       = 17.5;
+ramp_peak_d       = 21.5;
+
 ramp1_length      = 12;
 ramp_gap          = 1;
 ramp2_length      = 12;
 
-// Ramp geometry
-ramp_base_d       = 17.5;  // Base diameter at collar
-ramp_peak_d       = 21.5;  // Peak diameter at ramp tip
+spigot_length = ramp1_length + ramp_gap + ramp2_length;
 
 // Axial position where the sinker cavity ends (distance from nose)
 cavity_end        = 18;
@@ -40,7 +43,7 @@ transition_start  = 8;
 // EXTERIOR PROFILE
 // x = axial distance from nose
 // r = outside radius
-// Last point kept at 14.0 radius (28mm diameter) for hard edge
+// Hard edge at rear (28mm diameter)
 // -----------------------------
 module head_profile()
 {
@@ -65,16 +68,13 @@ module head_profile()
 
 
 // -----------------------------
-// COLLAR WITH INTEGRATED RAMPS
+// SKIRT COLLAR
 //
-// 23 mm long collar with:
-// - 12 mm first ramp
-// - 1 mm gap
-// - 12 mm second ramp
-// - 22 mm ID bore through center
-// - 28 mm OD cylinder base
+// Solid ring at the junction between
+// head and ramped skirt spigot.
+// 28mm OD, 22mm ID, ~3mm thick band.
 // -----------------------------
-module collar_with_ramps()
+module skirt_collar()
 {
     translate([
         0,
@@ -82,39 +82,83 @@ module collar_with_ramps()
         head_length
     ])
     {
-        // Outer cylinder base (full collar length)
+        difference()
+        {
+            cylinder(
+                d=collar_od,
+                h=collar_length
+            );
+            
+            cylinder(
+                d=collar_id,
+                h=collar_length
+            );
+        }
+    }
+}
+
+
+// -----------------------------
+// RAMPED SKIRT SPIGOT
+//
+// Sits below the collar, starts at
+// head_length + collar_length
+// -----------------------------
+module skirt_ramp(len)
+{
+    rotate_extrude()
+        polygon([
+            [0,0],
+            [ramp_base_d/2,0],
+            [ramp_peak_d/2,len],
+            [0,len]
+        ]);
+}
+
+
+module skirt_spigot()
+{
+    translate([
+        0,
+        0,
+        head_length + collar_length
+    ])
+    {
+        // Base support cylinder
         cylinder(
-            d=collar_od,
-            h=collar_length
+            d=ramp_base_d,
+            h=spigot_length
         );
-        
-        // First ramp (0-12 mm)
-        rotate_extrude()
-            polygon([
-                [0,0],
-                [ramp_base_d/2,0],
-                [ramp_peak_d/2,ramp1_length],
-                [0,ramp1_length]
-            ]);
-        
-        // Second ramp (13-25 mm, but only 12 mm long)
+
+        // First 12 mm ramp
+        skirt_ramp(ramp1_length);
+
+        // 1 mm separation
         translate([
             0,
             0,
             ramp1_length + ramp_gap
         ])
-        rotate_extrude()
-            polygon([
-                [0,0],
-                [ramp_base_d/2,0],
-                [ramp_peak_d/2,ramp2_length],
-                [0,ramp2_length]
-            ]);
+            skirt_ramp(ramp2_length);
     }
 }
 
 
-// Hollow out the 22mm bore
+// -----------------------------
+// EXTERIOR BODY
+// -----------------------------
+module exterior()
+{
+    union()
+    {
+        head_profile();
+        skirt_collar();
+        skirt_spigot();
+    }
+}
+
+
+// Bore through collar for egg weight insertion
 module collar_bore()
 {
     translate([
@@ -130,19 +174,6 @@ module collar_bore()
 
 
 // -----------------------------
-// EXTERIOR BODY
-// -----------------------------
-module exterior()
-{
-    union()
-    {
-        head_profile();
-        collar_with_ramps();
-    }
-}
-
-
-// -----------------------------
 // INTERNAL SINKER CAVITY
 //
 // 22 mm cavity enters from the rear
@@ -153,7 +184,7 @@ module exterior()
 // -----------------------------
 module sinker_cavity()
 {
-    cavity_start = head_length + collar_length;
+    cavity_start = head_length + collar_length + spigot_length;
 
     translate([
         0,
@@ -182,7 +213,7 @@ module leader_passage()
     ])
         cylinder(
             d=leader_bore,
-            h=head_length + collar_length + 2
+            h=head_length + collar_length + spigot_length + 2
         );
 }
 
