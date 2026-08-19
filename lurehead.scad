@@ -24,8 +24,8 @@ collar_id         = 22;    // Inner bore diameter for egg weight
 collar_length     = 3;     // Collar ring thickness
 
 // Ramped skirt spigot (below collar)
-ramp_base_d       = 17.5;
-ramp_peak_d       = 21.5;
+tube_od           = 22;    // Outer diameter of base tube (for skirts)
+ramp_peak_d       = 28;    // Peak diameter of ramps (matches head OD)
 
 ramp1_length      = 12;
 ramp_gap          = 1;
@@ -101,17 +101,20 @@ module skirt_collar()
 // -----------------------------
 // RAMPED SKIRT SPIGOT
 //
-// Sits below the collar, starts at
-// head_length + collar_length
+// Base tube (22mm OD) with two external ramps
+// that step up to 28mm diameter for skirt attachment.
+// Ramps are on the OUTSIDE so skirts slide over them.
+// Sits below the collar.
 // -----------------------------
 module skirt_ramp(len)
 {
+    // Ramp profile: starts at tube_od/2, ramps to ramp_peak_d/2
     rotate_extrude()
         polygon([
-            [0,0],
-            [ramp_base_d/2,0],
-            [ramp_peak_d/2,len],
-            [0,len]
+            [tube_od/2, 0],
+            [ramp_peak_d/2, 0],
+            [ramp_peak_d/2, len],
+            [tube_od/2, len]
         ]);
 }
 
@@ -124,16 +127,16 @@ module skirt_spigot()
         head_length + collar_length
     ])
     {
-        // Base support cylinder
+        // Base tube (22mm OD cylinder)
         cylinder(
-            d=ramp_base_d,
+            d=tube_od,
             h=spigot_length
         );
 
-        // First 12 mm ramp
+        // First external ramp (0-12 mm)
         skirt_ramp(ramp1_length);
 
-        // 1 mm separation
+        // Second external ramp (13-25 mm, positioned after gap)
         translate([
             0,
             0,
@@ -158,8 +161,8 @@ module exterior()
 }
 
 
-// Bore through collar for egg weight insertion
-module collar_bore()
+// Bore through collar and spigot for egg weight insertion
+module central_bore()
 {
     translate([
         0,
@@ -168,7 +171,7 @@ module collar_bore()
     ])
         cylinder(
             d=collar_id,
-            h=collar_length + 2
+            h=collar_length + spigot_length + 2
         );
 }
 
@@ -247,8 +250,8 @@ difference()
 {
     exterior();
 
-    // Collar bore for egg weight insertion
-    collar_bore();
+    // Central bore for egg weight insertion
+    central_bore();
 
     // Large egg-sinker cavity
     sinker_cavity();
