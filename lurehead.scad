@@ -28,7 +28,7 @@ extension_length  = 25;    // Total extension length
 tube_od_base      = 22;    // Base outer diameter at start of extension
 tube_id           = 22;    // Inner bore diameter (through center)
 
-ramp_peak_d       = 28;    // Peak diameter of ramps
+ramp_peak_d       = 24;    // Peak diameter of ramps (lower than head for smooth transition)
 
 ramp1_length      = 12;
 ramp_gap          = 1;
@@ -103,8 +103,9 @@ module skirt_collar()
 // EXTERNAL RAMP
 //
 // Ramped shoulder for skirt attachment.
-// Ramps from tube_od_base to ramp_peak_d diameter.
+// Ramps from 22mm to 24mm diameter.
 // Skirts rest on this angled surface.
+// No shoulder visible when skirts are on.
 // -----------------------------
 module external_ramp(len)
 {
@@ -123,10 +124,11 @@ module external_ramp(len)
 //
 // 25mm long hollow tube (22mm ID) with
 // two external ramped shoulders:
-// - 0-12mm: First ramp
+// - 0-12mm: First ramp (22mm to 24mm)
 // - 12-13mm: Gap (flat 22mm tube)
-// - 13-25mm: Second ramp
+// - 13-25mm: Second ramp (22mm to 24mm)
 // Sits below the collar.
+// Ramps below head diameter so no shoulder visible with skirts.
 // -----------------------------
 module extension_with_ramps()
 {
