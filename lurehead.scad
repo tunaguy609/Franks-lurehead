@@ -13,7 +13,7 @@ $fn = 128;
 // -----------------------------
 // KEY DIMENSIONS
 // -----------------------------
-head_length       = 62;     // nose-to-rear of main head
+head_length       = 57;     // nose-to-rear of main head
 max_diameter      = 28;     // maximum OD of head
 leader_bore       = 2.5;    // through-hole for leader wire
 
@@ -68,8 +68,8 @@ module head_profile()
             [13.75,32.0],
             [13.9, 34.0],
             [14.0, 37.0],   // reaches full 28 mm OD here
-            [14.0, 62.0],   // hold 28 mm OD to rear face
-            [ 0.0, 62.0]    // close polygon at axis
+            [14.0, 57.0],   // hold 28 mm OD to rear face
+            [ 0.0, 57.0]    // close polygon at axis
         ]);
 }
 
