@@ -43,24 +43,22 @@ transition_start  = 8;
 // -----------------------------
 module head_profile()
 {
-    // rotate_extrude expects points as [radius, z]
-    // (not [z, radius])
     rotate_extrude()
         polygon([
-            [0,0],        // tip on axis
-            [1.5,3.2],
-            [4.0,5.0],
-            [8.0,7.0],
-            [14.0,9.5],
-            [21.0,11.8],
-            [29.0,13.4],
-            [37.0,14.0],
-            [45.0,14.0],
-            [51.0,13.6],
-            [56.0,12.8],
-            [59.5,12.8],
-            [62.0,14.0],  // rear OD = 28 mm
-            [62.0,0]      // close at axis
+            [0,0],
+            [3.2,1.5],
+            [5.0,4.0],
+            [7.0,8.0],
+            [9.5,14.0],
+            [11.8,21.0],
+            [13.4,29.0],
+            [14.0,37.0],
+            [14.0,45.0],
+            [13.6,51.0],
+            [12.8,56.0],
+            [12.8,59.5],
+            [14.0,62.0],
+            [0,62.0]
         ]);
 }
 
@@ -97,23 +95,15 @@ module external_ramp(len)
 // -----------------------------
 module extension_with_ramps()
 {
-    // Curved shoulder blend (28 mm head -> 23 mm tube)
-    blend_len = 2.2;          // axial length of blend
-    mid_z     = 0.55*blend_len;
-    mid_d     = tube_od + 0.62*(max_diameter - tube_od);
+    // Safe linear blend to remove hard shoulder from 28 mm head -> 23 mm tube
+    blend_len = 2.0;
 
-    // Smooth transition using hull of very thin rings
-    hull()
-    {
-        translate([0,0,head_length - blend_len])
-            cylinder(d=max_diameter, h=0.01);
-
-        translate([0,0,head_length - blend_len + mid_z])
-            cylinder(d=mid_d, h=0.01);
-
-        translate([0,0,head_length])
-            cylinder(d=tube_od, h=0.01);
-    }
+    translate([0,0,head_length - blend_len])
+        cylinder(
+            d1=max_diameter,
+            d2=tube_od,
+            h=blend_len
+        );
 
     translate([
         0,
