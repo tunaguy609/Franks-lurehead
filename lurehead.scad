@@ -1,4 +1,3 @@
-//
 // GREEN MACHINE STYLE OFFSHORE TROLLING LURE HEAD
 // 30 mm maximum OD  |  22 mm sinker cavity
 // No skirt collar/ridge — straight spigot so collar can be restarted later.
