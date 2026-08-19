@@ -13,17 +13,17 @@ $fn = 128;
 // -----------------------------
 // KEY DIMENSIONS
 // -----------------------------
-head_length       = 62;     // nose-to-rear of main head
+head_length       = 58;     // nose-to-rear of main head
 max_diameter      = 29;     // maximum OD of head
 leader_bore       = 2.5;    // through-hole for leader wire
 
-min_wall          = 5.0;
-sinker_bore       = max_diameter - 2*min_wall;  // 19 mm — egg-sinker cavity ID
+min_wall          = 4.25;
+sinker_bore       = 21.5;   // egg-sinker cavity ID
 
 // Eye pockets: flat-bottom cylindrical recesses on ±Y sides
 eye_diameter      = 10.25;
 eye_depth         = 3.5;
-eye_z             = 43;     // axial station (from nose) to pocket centre
+eye_z             = 39;     // axial station (from nose) to pocket centre
 
 // Skirt spigot (extension): hollow tube with a single ramped section
 // and a collar at the end to retain rubber skirts.
@@ -68,8 +68,8 @@ module head_profile()
             [13.75,32.0],
             [14.2, 34.0],
             [14.5, 37.0],   // reaches full 29 mm OD here
-            [14.5, 62.0],   // hold 29 mm OD to rear face
-            [ 0.0, 62.0]    // close polygon at axis
+            [14.5, 58.0],   // hold 29 mm OD to rear face
+            [ 0.0, 58.0]    // close polygon at axis
         ]);
 }
 
@@ -137,7 +137,7 @@ module leader_passage()
 
 // -----------------------------
 // Front cavity transition — tapers from the 2.5 mm leader bore
-// up to the 19 mm sinker cavity over the span
+// up to the 21.5 mm sinker cavity over the span
 // [transition_start … cavity_end].
 // d1 (narrow end) is at the nose side; d2 (wide end) joins the cavity.
 // -----------------------------
@@ -153,7 +153,7 @@ module cavity_transition()
 
 
 // -----------------------------
-// Sinker cavity — 19 mm cylindrical void that accepts an egg sinker.
+// Sinker cavity — 21.5 mm cylindrical void that accepts an egg sinker.
 // Runs from cavity_end (18 mm from nose) through to the open rear.
 // Extended by 1 mm past the rear to guarantee a clean cut.
 // -----------------------------
@@ -204,7 +204,7 @@ difference()
 
     leader_passage();       // continuous 2.5 mm through-hole
     cavity_transition();    // flared taper from leader bore to cavity
-    sinker_cavity();        // 19 mm egg-sinker void from rear
+    sinker_cavity();        // 21.5 mm egg-sinker void from rear
     central_bore();         // hollow core of skirt spigot
     eye_pockets();          // side recesses for doll eyes
 }
