@@ -17,7 +17,7 @@ max_diameter      = 30;     // maximum OD of head
 leader_bore       = 2.5;    // through-hole for leader wire
 
 min_wall          = 5.0;
-sinker_bore       = max_diameter - 2*min_wall;  // 20 mm — egg-sinker cavity ID
+sinker_bore       = 21.5;   // sinker cavity ID
 
 // Eye pockets: flat-bottom cylindrical recesses on ±Y sides
 eye_diameter      = 10.25;
@@ -83,7 +83,7 @@ module leader_passage()
 
 // -----------------------------
 // Front cavity transition — tapers from the 2.5 mm leader bore
-// up to the 20 mm sinker cavity over the span
+// up to the sinker cavity over the span
 // [transition_start … cavity_end].
 // d1 (narrow end) is at the nose side; d2 (wide end) joins the cavity.
 // -----------------------------
@@ -99,7 +99,7 @@ module cavity_transition()
 
 
 // -----------------------------
-// Sinker cavity — 20 mm cylindrical void that accepts an egg sinker.
+// Sinker cavity — cylindrical void that accepts an egg sinker.
 // Runs from cavity_end (18 mm from nose) through to the rear face.
 // Extended by 1 mm past the rear to guarantee a clean cut.
 // -----------------------------
@@ -136,6 +136,6 @@ difference()
 
     leader_passage();       // continuous 2.5 mm through-hole
     cavity_transition();    // flared taper from leader bore to cavity
-    sinker_cavity();        // 20 mm egg-sinker void from rear
+    sinker_cavity();        // 21.5 mm egg-sinker void from rear
     eye_pockets();          // side recesses for doll eyes
 }
