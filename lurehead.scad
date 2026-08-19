@@ -25,10 +25,9 @@ collar_length     = 3;     // Collar ring thickness
 
 // Extension tube with external ramps
 extension_length  = 25;    // Total extension length
-tube_od_base      = 22;    // Base outer diameter at start of extension
+tube_od           = 23;    // Outer diameter of tube
 tube_id           = 22;    // Inner bore diameter (through center)
-
-ramp_peak_d       = 24;    // Peak diameter of ramps (lower than head for smooth transition)
+ramp_peak_d       = 25;    // Peak diameter of ramps
 
 ramp1_length      = 12;
 ramp_gap          = 1;
@@ -102,19 +101,18 @@ module skirt_collar()
 // -----------------------------
 // EXTERNAL RAMP
 //
-// Ramped shoulder for skirt attachment.
-// Ramps from 22mm to 24mm diameter.
-// Skirts rest on this angled surface.
-// No shoulder visible when skirts are on.
+// Ramped shoulder that flares outward for skirt attachment.
+// Ramps from 23mm to 25mm diameter.
+// Skirts rest on this angled flaring surface.
 // -----------------------------
 module external_ramp(len)
 {
     rotate_extrude()
         polygon([
-            [tube_od_base/2, 0],
+            [tube_od/2, 0],
             [ramp_peak_d/2, 0],
             [ramp_peak_d/2, len],
-            [tube_od_base/2, len]
+            [tube_od/2, len]
         ]);
 }
 
@@ -122,13 +120,13 @@ module external_ramp(len)
 // -----------------------------
 // EXTENSION TUBE WITH RAMPS
 //
-// 25mm long hollow tube (22mm ID) with
-// two external ramped shoulders:
-// - 0-12mm: First ramp (22mm to 24mm)
-// - 12-13mm: Gap (flat 22mm tube)
-// - 13-25mm: Second ramp (22mm to 24mm)
+// 25mm long tube (23mm OD, 22mm ID) with
+// two external flaring ramps:
+// - 0-12mm: First ramp (23mm to 25mm)
+// - 12-13mm: Flat gap (23mm tube only)
+// - 13-25mm: Second ramp (23mm to 25mm)
 // Sits below the collar.
-// Ramps below head diameter so no shoulder visible with skirts.
+// Ramps flare outward where skirts rest.
 // -----------------------------
 module extension_with_ramps()
 {
@@ -138,13 +136,13 @@ module extension_with_ramps()
         head_length + collar_length
     ])
     {
-        // Base tube (22mm OD, extends full length)
+        // Base tube (23mm OD, extends full length)
         cylinder(
-            d=tube_od_base,
+            d=tube_od,
             h=extension_length
         );
 
-        // First external ramp (0-12 mm)
+        // First external ramp (0-12 mm, flares to 25mm)
         external_ramp(ramp1_length);
 
         // Second external ramp (13-25 mm, positioned after gap)
