@@ -18,17 +18,16 @@ leader_bore       = 2.5;
 min_wall          = 3.0;
 sinker_bore       = max_diameter - 2*min_wall;  // 22 mm
 
-// Eye pocket geometry
+// Eye pocket geometry (flat-bottom recesses)
 eye_diameter      = 10.25;
 eye_depth         = 2.5;
-// Place eyes centered on main 28 mm body zone
 eye_z             = 43;
 
-// Extension tube with external ramps
+// Extension tube with integrated ramps (profile-driven)
 extension_length  = 25;    // Total extension length
-tube_od           = 23;    // Outer diameter of tube
+tube_od           = 23;    // Baseline diameter
 tube_id           = 22;    // Inner bore diameter (through center)
-ramp_peak_d       = 25;    // Peak diameter of ramps
+ramp_peak_d       = 25;    // Peak diameter of ramp sections
 
 ramp1_length      = 12;
 ramp_gap          = 1;
@@ -79,74 +78,44 @@ module head_profile()
 
 
 // -----------------------------
-// EXTERNAL RAMP
-//
-// Ramped shoulder that flares outward for skirt attachment.
-// Ramps from 23mm to 25mm diameter.
-// Skirts rest on this angled flaring surface.
+// INTEGRATED SKIRT TUBE PROFILE
+// (tube itself forms the two ramp/peak sections)
 // -----------------------------
-module external_ramp(len)
+module extension_with_ramps()
 {
+    z0 = head_length;
+    z1 = z0 + ramp1_length;              // end section 1
+    z2 = z1 + ramp_gap;                  // end gap
+    z3 = z2 + ramp2_length;              // end section 2
+
+    r_base = tube_od/2;                  // 11.5
+    r_peak = ramp_peak_d/2;              // 12.5
+
+    // Piecewise profile in (radius, axial-z)
     rotate_extrude()
         polygon([
-            [tube_od/2, 0],
-            [ramp_peak_d/2, 0],
-            [ramp_peak_d/2, len],
-            [tube_od/2, len]
+            [0, z0],
+            [r_base, z0],
+            [r_peak, z1],   // ramp up over first 12 mm
+            [r_base, z2],   // ramp down across 1 mm gap
+            [r_peak, z3],   // ramp up over second 12 mm
+            [0, z3]
         ]);
 }
 
 
-// -----------------------------
-// EXTENSION TUBE WITH RAMPS
-//
-// 25mm long tube (23mm OD, 22mm ID) with
-// two external flaring ramps:
-// - 0-12mm: First ramp (23mm to 25mm)
-// - 12-13mm: Flat gap (23mm tube only)
-// - 13-25mm: Second ramp (23mm to 25mm)
-// Ramps flare outward where skirts rest.
-// Directly attached to head profile (no collar).
-// -----------------------------
-module extension_with_ramps()
-{
-    translate([
-        0,
-        0,
-        head_length
-    ])
-    {
-        // Base tube (23mm OD, extends full length)
-        cylinder(
-            d=tube_od,
-            h=extension_length
-        );
-
-        // First external ramp (0-12 mm, flares to 25mm)
-        external_ramp(ramp1_length);
-
-        // Second external ramp (13-25 mm, positioned after gap)
-        translate([
-            0,
-            0,
-            ramp1_length + ramp_gap
-        ])
-            external_ramp(ramp2_length);
-    }
-}
-
-
-// Eye pockets (one per side, left/right) - spherical cuts guarantee outside placement
+// Flat-bottom eye pockets (cylindrical counterbores, mirrored left/right)
 module eye_pockets()
 {
-    // spherical pocket depth on cylindrical surface
-    R  = max_diameter/2;
-    rs = eye_diameter/2;
-    eye_center_x = R - eye_depth + rs;
+    R = max_diameter/2;           // surface radius on 28 mm body
+    eye_r = eye_diameter/2;
+    // center so pocket depth at side surface equals eye_depth
+    xc = R - eye_depth + eye_r;
 
     for (side = [-1, 1])
-        translate([side*eye_center_x, 0, eye_z])
-            sphere(r=rs);
+        translate([side*xc, 0, eye_z])
+            rotate([0,90,0])
+                cylinder(d=eye_diameter, h=eye_depth*2, center=true);
 }
 
 
