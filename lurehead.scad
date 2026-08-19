@@ -1,6 +1,6 @@
 //
 // GREEN MACHINE STYLE OFFSHORE TROLLING LURE HEAD
-// 28 mm maximum OD  |  22 mm sinker cavity
+// 28 mm maximum OD  |  18 mm sinker cavity
 // Double 12 mm ramped skirt spigot with 1 mm gap
 //
 // Print orientation: nose down (+Z toward rear / open cavity end).
@@ -17,8 +17,8 @@ head_length       = 62;     // nose-to-rear of main head
 max_diameter      = 28;     // maximum OD of head
 leader_bore       = 2.5;    // through-hole for leader wire
 
-min_wall          = 3.0;
-sinker_bore       = max_diameter - 2*min_wall;  // 22 mm — egg-sinker cavity ID
+min_wall          = 5.0;
+sinker_bore       = max_diameter - 2*min_wall;  // 18 mm — egg-sinker cavity ID
 
 // Eye pockets: flat-bottom cylindrical recesses on ±Y sides
 eye_diameter      = 10.25;
@@ -157,7 +157,7 @@ module leader_passage()
 
 // -----------------------------
 // Front cavity transition — tapers from the 2.5 mm leader bore
-// up to the 22 mm sinker cavity over the span
+// up to the 18 mm sinker cavity over the span
 // [transition_start … cavity_end].
 // d1 (narrow end) is at the nose side; d2 (wide end) joins the cavity.
 // -----------------------------
@@ -173,7 +173,7 @@ module cavity_transition()
 
 
 // -----------------------------
-// Sinker cavity — 22 mm cylindrical void that accepts an egg sinker.
+// Sinker cavity — 18 mm cylindrical void that accepts an egg sinker.
 // Runs from cavity_end (18 mm from nose) through to the open rear.
 // Extended by 1 mm past the rear to guarantee a clean cut.
 // -----------------------------
@@ -224,7 +224,7 @@ difference()
 
     leader_passage();       // continuous 2.5 mm through-hole
     cavity_transition();    // flared taper from leader bore to cavity
-    sinker_cavity();        // 22 mm egg-sinker void from rear
+    sinker_cavity();        // 18 mm egg-sinker void from rear
     central_bore();         // hollow core of skirt spigot
     eye_pockets();          // side recesses for doll eyes
 }
