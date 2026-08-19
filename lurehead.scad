@@ -1,7 +1,7 @@
 //
 // GREEN MACHINE STYLE OFFSHORE TROLLING LURE HEAD
-// 28 mm maximum OD  |  22 mm sinker cavity
-// Double 12 mm ramped skirt spigot with 1 mm gap
+// 29 mm maximum OD  |  21.5 mm skirt bore
+// Single 12 mm ramped skirt section with end collar
 //
 // Print orientation: nose down (+Z toward rear / open cavity end).
 // All dimensions in millimeters.
@@ -14,27 +14,27 @@ $fn = 128;
 // KEY DIMENSIONS
 // -----------------------------
 head_length       = 62;     // nose-to-rear of main head
-max_diameter      = 28;     // maximum OD of head
+max_diameter      = 29;     // maximum OD of head
 leader_bore       = 2.5;    // through-hole for leader wire
 
 min_wall          = 5.0;
-sinker_bore       = max_diameter - 2*min_wall;  // 18 mm — egg-sinker cavity ID
+sinker_bore       = max_diameter - 2*min_wall;  // 19 mm — egg-sinker cavity ID
 
 // Eye pockets: flat-bottom cylindrical recesses on ±Y sides
 eye_diameter      = 10.25;
 eye_depth         = 3.5;
 eye_z             = 43;     // axial station (from nose) to pocket centre
 
-// Skirt spigot (extension): hollow tube with two ramped ridges
-// that retain rubber skirts.  Sits aft of the main head.
+// Skirt spigot (extension): hollow tube with a single ramped section
+// and a collar at the end to retain rubber skirts.
 extension_length  = 25;
-tube_od           = 23;     // spigot outer diameter (at base and gap)
-tube_id           = 22;     // spigot inner bore
-ramp_peak_d       = 25;     // outer diameter at ramp peaks
+tube_od           = 23;     // spigot outer diameter (at base)
+tube_id           = 21.5;   // spigot inner bore
+ramp_peak_d       = 24;     // outer diameter at ramp peak
+collar_d          = 24;     // collar outer diameter at end of tube
 
-ramp1_length      = 12;     // axial length of first ramp section
-ramp_gap          = 1;      // axial gap between the two ramp sections
-ramp2_length      = 12;     // axial length of second ramp section
+ramp1_length      = 12;     // axial length of ramp section
+collar_length     = 2;      // axial length of end collar
 
 // Internal cavity limits (measured from nose)
 cavity_end        = 18;     // forward end of the sinker cavity
@@ -48,7 +48,7 @@ transition_start  = 8;      // where the leader bore starts flaring to cavity
 // -----------------------------
 // Head profile (rotated about Z)
 // Points are [radius, z-height] — nose at z=0.
-// Ogive shoulder widens to 28 mm OD, then holds
+// Ogive shoulder widens to 29 mm OD, then holds
 // that diameter to the rear face at z = head_length.
 // -----------------------------
 module head_profile()
@@ -66,64 +66,44 @@ module head_profile()
             [13.3, 28.0],
             [13.55,30.0],
             [13.75,32.0],
-            [13.9, 34.0],
-            [14.0, 37.0],   // reaches full 28 mm OD here
-            [14.0, 62.0],   // hold 28 mm OD to rear face
+            [14.2, 34.0],
+            [14.5, 37.0],   // reaches full 29 mm OD here
+            [14.5, 62.0],   // hold 29 mm OD to rear face
             [ 0.0, 62.0]    // close polygon at axis
         ]);
 }
 
 
 // -----------------------------
-// Skirt spigot with double ramp ridges.
-//
-// Built as a union of hull() pairs so the solid truly
-// extends along the lure axis (rotate_extrude with axial
-// coordinates does not produce an axial solid).
+// Skirt spigot with one ramp and an end collar.
 //
 // The spigot is a hollow tube (central bore removed later).
-// Ramp profile (two outward ridges, open/sharp at rear):
-//   z0 ──(r_base)──> z1 ──(r_peak)
-//                               \──> z2 ──(r_base)──> z3 ──(r_peak)
-//   Three hull segments:
-//     seg 1: z0→z1  ramp up to first ridge peak
-//     seg 2: z1→z2  ramp down across 1 mm gap
-//     seg 3: z2→z3  ramp up to second ridge peak (open at rear)
-//
-//   z0 = head_length   z1 = z0+ramp1_length
-//   z2 = z1+ramp_gap   z3 = z2+ramp2_length
+// Ramp profile:
+//   z0 ──(r_base)──> z1 ──(r_peak)──> z2 ──(r_collar)
 // -----------------------------
-module extension_with_ramps()
+module extension_with_ramp_and_collar()
 {
     z0 = head_length;
     z1 = z0 + ramp1_length;
-    z2 = z1 + ramp_gap;
-    z3 = z2 + ramp2_length;
+    z2 = z1 + collar_length;
 
-    r_base = tube_od / 2;   // 11.5 mm — base and gap radius
-    r_peak = ramp_peak_d / 2; // 12.5 mm — ramp peak radius
+    r_base   = tube_od / 2;      // 11.5 mm
+    r_peak   = ramp_peak_d / 2;  // 12.0 mm
+    r_collar = collar_d / 2;     // 12.0 mm
 
-    // Each segment is a frustum built with hull() between thin discs.
-    // Using h=0.01 to get a clean zero-thickness cap without artefacts.
     union()
     {
-        // segment 1: ramp up from base to peak
+        // ramp up from base to peak
         hull()
         {
             translate([0, 0, z0]) cylinder(h=0.01, r=r_base);
             translate([0, 0, z1]) cylinder(h=0.01, r=r_peak);
         }
-        // segment 2: ramp down (the 1 mm gap between ridges)
+        // end collar, held at the peak diameter
         hull()
         {
             translate([0, 0, z1]) cylinder(h=0.01, r=r_peak);
-            translate([0, 0, z2]) cylinder(h=0.01, r=r_base);
-        }
-        // segment 3: ramp up for second ridge
-        hull()
-        {
-            translate([0, 0, z2]) cylinder(h=0.01, r=r_base);
-            translate([0, 0, z3]) cylinder(h=0.01, r=r_peak);
+            translate([0, 0, z2]) cylinder(h=0.01, r=r_collar);
         }
     }
 }
@@ -135,7 +115,7 @@ module exterior()
     union()
     {
         head_profile();
-        extension_with_ramps();
+        extension_with_ramp_and_collar();
     }
 }
 
@@ -157,7 +137,7 @@ module leader_passage()
 
 // -----------------------------
 // Front cavity transition — tapers from the 2.5 mm leader bore
-// up to the 22 mm sinker cavity over the span
+// up to the 19 mm sinker cavity over the span
 // [transition_start … cavity_end].
 // d1 (narrow end) is at the nose side; d2 (wide end) joins the cavity.
 // -----------------------------
@@ -173,7 +153,7 @@ module cavity_transition()
 
 
 // -----------------------------
-// Sinker cavity — 22 mm cylindrical void that accepts an egg sinker.
+// Sinker cavity — 19 mm cylindrical void that accepts an egg sinker.
 // Runs from cavity_end (18 mm from nose) through to the open rear.
 // Extended by 1 mm past the rear to guarantee a clean cut.
 // -----------------------------
@@ -224,7 +204,7 @@ difference()
 
     leader_passage();       // continuous 2.5 mm through-hole
     cavity_transition();    // flared taper from leader bore to cavity
-    sinker_cavity();        // 22 mm egg-sinker void from rear
+    sinker_cavity();        // 19 mm egg-sinker void from rear
     central_bore();         // hollow core of skirt spigot
     eye_pockets();          // side recesses for doll eyes
 }
