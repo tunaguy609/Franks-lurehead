@@ -58,13 +58,13 @@ module head_profile()
             [9.5,14.0],
             [11.8,21.0],
 
-            // Smooth lower shoulder (remove visible seam/ring)
-            [12.8,25.0],
-            [13.15,27.0],
-            [13.4,29.0],
-            [13.6,31.0],
-            [13.8,33.0],
-            [13.9,35.0],
+            // smooth monotonic shoulder to eliminate ring seam
+            [12.6,24.0],
+            [13.0,26.0],
+            [13.3,28.0],
+            [13.55,30.0],
+            [13.75,32.0],
+            [13.9,34.0],
             [14.0,37.0],
 
             // hold 28 mm OD through rear of main head
@@ -110,19 +110,16 @@ module external_ramp(len)
 // -----------------------------
 module extension_with_ramps()
 {
-    // Tiny overlap into head to avoid coplanar seam at joint
-    eps = 0.05;
-
     translate([
         0,
         0,
-        head_length - eps
+        head_length
     ])
     {
         // Base tube (23mm OD, extends full length)
         cylinder(
             d=tube_od,
-            h=extension_length + eps
+            h=extension_length
         );
 
         // First external ramp (0-12 mm, flares to 25mm)
@@ -139,20 +136,17 @@ module extension_with_ramps()
 }
 
 
-// Eye pockets (one per side, left/right)
+// Eye pockets (one per side, left/right) - spherical cuts guarantee outside placement
 module eye_pockets()
 {
-    // On 28 mm OD body, outer surface at radius = 14
-    // For depth D, eye center should be at (14 - D + eye_radius) from center
-    eye_r = eye_diameter/2;
-    eye_center_x = max_diameter/2 - eye_depth + eye_r;
+    // spherical pocket depth on cylindrical surface
+    R  = max_diameter/2;
+    rs = eye_diameter/2;
+    eye_center_x = R - eye_depth + rs;
 
     for (side = [-1, 1])
-    {
         translate([side*eye_center_x, 0, eye_z])
-            rotate([0,90,0])
-                cylinder(d=eye_diameter, h=eye_depth + 1.0, center=true);
-    }
+            sphere(r=rs);
 }
 
 
