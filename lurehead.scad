@@ -18,6 +18,12 @@ leader_bore       = 2.5;
 min_wall          = 3.0;
 sinker_bore       = max_diameter - 2*min_wall;  // 22 mm
 
+// Eye pocket geometry
+eye_diameter      = 10.25;
+eye_depth         = 2.5;
+// Place eyes centered on main 28 mm body zone
+eye_z             = 43;
+
 // Extension tube with external ramps
 extension_length  = 25;    // Total extension length
 tube_od           = 23;    // Outer diameter of tube
@@ -128,6 +134,22 @@ module extension_with_ramps()
 }
 
 
+// Eye pockets (one per side)
+module eye_pockets()
+{
+    // On a 28 mm OD body, surface is at radius 14
+    // Pocket center moved inward by depth so cut depth = eye_depth
+    eye_center_offset = max_diameter/2 - eye_depth;
+
+    for (side = [-1, 1])
+    {
+        translate([0, side*eye_center_offset, eye_z])
+            rotate([90,0,0])
+                cylinder(d=eye_diameter, h=eye_depth + 0.6, center=true);
+    }
+}
+
+
 // Central bore through extension
 module central_bore()
 {
@@ -229,6 +251,9 @@ module cavity_transition()
 difference()
 {
     exterior();
+
+    // Eye pockets
+    eye_pockets();
 
     // Central bore for egg weight insertion
     central_bore();
