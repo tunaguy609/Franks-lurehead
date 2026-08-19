@@ -107,15 +107,13 @@ module extension_with_ramps()
 // Flat-bottom eye pockets (cylindrical counterbores, mirrored left/right)
 module eye_pockets()
 {
-    R = max_diameter/2;           // surface radius on 28 mm body
-    eye_r = eye_diameter/2;
-    // center so pocket depth at side surface equals eye_depth
-    xc = R - eye_depth + eye_r;
+    // Flat-bottom side pockets, guaranteed to intersect exterior
+    xc = max_diameter/2 - eye_depth/2;
 
     for (side = [-1, 1])
         translate([side*xc, 0, eye_z])
             rotate([0,90,0])
-                cylinder(d=eye_diameter, h=eye_depth*2, center=true);
+                cylinder(d=eye_diameter, h=eye_depth + 4, center=true);
 }
 
 
