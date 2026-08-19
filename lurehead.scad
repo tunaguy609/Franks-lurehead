@@ -33,6 +33,11 @@ cavity_end        = 18;
 // Axial position where the front taper begins
 transition_start  = 8;
 
+// Skirt collar dimensions
+collar_od         = 25;    // Outer diameter of collar
+collar_height     = 3.0;   // Height/thickness of collar
+collar_position   = head_length - 2;  // Position on the head body
+
 
 // -----------------------------
 // EXTERIOR PROFILE
@@ -58,6 +63,31 @@ module head_profile()
             [10.8,62.0],
             [0,62.0]
         ]);
+}
+
+
+// -----------------------------
+// SKIRT COLLAR
+//
+// Decorative/functional ring at the
+// base of the lure head where it meets
+// the spigot.
+// -----------------------------
+module skirt_collar()
+{
+    translate([
+        0,
+        0,
+        collar_position
+    ])
+    {
+        // Main collar ring
+        cylinder(
+            d=collar_od,
+            h=collar_height,
+            center=true
+        );
+    }
 }
 
 
@@ -112,6 +142,9 @@ module exterior()
             head_length
         ])
             skirt_spigot();
+        
+        // Add skirt collar
+        skirt_collar();
     }
 }
 
