@@ -28,8 +28,8 @@ eye_z             = 43;     // axial station (from nose) to pocket centre
 // Skirt spigot (extension): hollow tube with one ramped ridge,
 // then returns to tube OD and continues straight aft.
 extension_length  = 25;
-tube_od           = 23;     // spigot outer diameter (base / straight section)
-tube_id           = 22;     // spigot inner bore
+tube_od           = 25;     // spigot outer diameter (base / straight section)
+tube_id           = 21.5;   // spigot inner bore
 ramp_peak_d       = 25;     // outer diameter at ramp peak
 
 ramp1_length      = 12;     // axial length of first ramp section
