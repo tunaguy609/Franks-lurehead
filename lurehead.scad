@@ -21,6 +21,7 @@ sinker_bore       = max_diameter - 2*min_wall;  // 22 mm
 // Eye pocket geometry (flat-bottom recesses)
 eye_diameter      = 10.25;
 eye_depth         = 2.5;
+// distance from nose along lure axis
 eye_z             = 43;
 
 // Extension tube with integrated ramps (profile-driven)
@@ -104,13 +105,14 @@ module extension_with_ramps()
 }
 
 
-// Flat-bottom eye pockets (cylindrical counterbores, mirrored left/right)
+// Flat-bottom eye pockets on ±Y sides at axial station eye_z
 module eye_pockets()
 {
+    eye_x = eye_z;
+
     for (side = [-1, 1])
-        translate([side*(max_diameter/2 - eye_depth), 0, eye_z])
-            rotate([0,90,0])
-                // long cutter guarantees subtraction intersection
+        translate([eye_x, side*(max_diameter/2 - eye_depth), 0])
+            rotate([90,0,0])
                 cylinder(d=eye_diameter, h=max_diameter*2, center=true);
 }
 
