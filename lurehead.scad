@@ -95,16 +95,6 @@ module external_ramp(len)
 // -----------------------------
 module extension_with_ramps()
 {
-    // Safe linear blend to remove hard shoulder from 28 mm head -> 23 mm tube
-    blend_len = 2.0;
-
-    translate([0,0,head_length - blend_len])
-        cylinder(
-            d1=max_diameter,
-            d2=tube_od,
-            h=blend_len
-        );
-
     translate([
         0,
         0,
