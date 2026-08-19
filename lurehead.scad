@@ -1,7 +1,7 @@
 //
 // GREEN MACHINE STYLE OFFSHORE TROLLING LURE HEAD
 // 28 mm maximum OD  |  22 mm sinker cavity
-// Double 12 mm ramped skirt spigot with 1 mm gap
+// Single 12 mm ramp + 1 mm return gap + 12 mm straight skirt tube
 //
 // Print orientation: nose down (+Z toward rear / open cavity end).
 // All dimensions in millimeters.
@@ -25,16 +25,16 @@ eye_diameter      = 10.25;
 eye_depth         = 2.5;
 eye_z             = 43;     // axial station (from nose) to pocket centre
 
-// Skirt spigot (extension): hollow tube with two ramped ridges
-// that retain rubber skirts.  Sits aft of the main head.
+// Skirt spigot (extension): hollow tube with one ramped ridge,
+// then returns to tube OD and continues straight aft.
 extension_length  = 25;
-tube_od           = 23;     // spigot outer diameter (at base and gap)
+tube_od           = 23;     // spigot outer diameter (base / straight section)
 tube_id           = 22;     // spigot inner bore
-ramp_peak_d       = 25;     // outer diameter at ramp peaks
+ramp_peak_d       = 25;     // outer diameter at ramp peak
 
 ramp1_length      = 12;     // axial length of first ramp section
-ramp_gap          = 1;      // axial gap between the two ramp sections
-ramp2_length      = 12;     // axial length of second ramp section
+ramp_gap          = 1;      // axial return gap from peak back to tube OD
+ramp2_length      = 12;     // axial length of straight tube section after gap
 
 // Internal cavity limits (measured from nose)
 cavity_end        = 18;     // forward end of the sinker cavity
@@ -75,20 +75,20 @@ module head_profile()
 
 
 // -----------------------------
-// Skirt spigot with double ramp ridges.
+// Skirt spigot with single ramp ridge.
 //
 // Built as a union of hull() pairs so the solid truly
 // extends along the lure axis (rotate_extrude with axial
 // coordinates does not produce an axial solid).
 //
 // The spigot is a hollow tube (central bore removed later).
-// Ramp profile (two outward ridges, open/sharp at rear):
+// Profile:
 //   z0 ──(r_base)──> z1 ──(r_peak)
-//                               \\──> z2 ──(r_base)──> z3 ──(r_peak)
-//   Three hull segments:
-//     seg 1: z0→z1  ramp up to first ridge peak
+//                               \\──> z2 ──(r_base)──> z3 ──(r_base)
+//   Three segments:
+//     seg 1: z0→z1  ramp up to ridge peak
 //     seg 2: z1→z2  ramp down across 1 mm gap
-//     seg 3: z2→z3  ramp up to second ridge peak (open at rear)
+//     seg 3: z2→z3  straight tube at tube_od (no second ramp)
 //
 //   z0 = head_length   z1 = z0+ramp1_length
 //   z2 = z1+ramp_gap   z3 = z2+ramp2_length
@@ -100,31 +100,28 @@ module extension_with_ramps()
     z2 = z1 + ramp_gap;
     z3 = z2 + ramp2_length;
 
-    r_base = tube_od / 2;   // 11.5 mm — base and gap radius
-    r_peak = ramp_peak_d / 2; // 12.5 mm — ramp peak radius
+    r_base = tube_od / 2;      // constant tube radius
+    r_peak = ramp_peak_d / 2;  // first ramp peak radius
 
-    // Each segment is a frustum built with hull() between thin discs.
-    // Using h=0.01 to get a clean zero-thickness cap without artefacts.
     union()
     {
-        // segment 1: ramp up from base to peak
+        // segment 1: ramp up from tube OD to peak
         hull()
         {
             translate([0, 0, z0]) cylinder(h=0.01, r=r_base);
             translate([0, 0, z1]) cylinder(h=0.01, r=r_peak);
         }
-        // segment 2: ramp down (the 1 mm gap between ridges)
+
+        // segment 2: ramp down from peak back to tube OD across the 1 mm gap
         hull()
         {
             translate([0, 0, z1]) cylinder(h=0.01, r=r_peak);
             translate([0, 0, z2]) cylinder(h=0.01, r=r_base);
         }
-        // segment 3: ramp up for second ridge
-        hull()
-        {
-            translate([0, 0, z2]) cylinder(h=0.01, r=r_base);
-            translate([0, 0, z3]) cylinder(h=0.01, r=r_peak);
-        }
+
+        // segment 3: straight tube (no second ramp)
+        translate([0, 0, z2])
+            cylinder(h=z3 - z2, r=r_base);
     }
 }
 
