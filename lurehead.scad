@@ -34,9 +34,9 @@ cavity_end        = 18;
 transition_start  = 8;
 
 // Skirt collar dimensions
-collar_od         = 25;    // Outer diameter of collar
-collar_height     = 3.0;   // Height/thickness of collar
-collar_position   = head_length - 2;  // Position on the head body
+collar_od         = 28.5;  // Outer diameter of collar (slightly larger than head max)
+collar_id         = 22.0;  // Inner diameter matches spigot base
+collar_height     = 2.0;   // Height/thickness of collar
 
 
 // -----------------------------
@@ -69,24 +69,30 @@ module head_profile()
 // -----------------------------
 // SKIRT COLLAR
 //
-// Decorative/functional ring at the
-// base of the lure head where it meets
-// the spigot.
+// Ring collar at junction of head
+// and spigot with ramps.
 // -----------------------------
 module skirt_collar()
 {
     translate([
         0,
         0,
-        collar_position
+        head_length
     ])
     {
-        // Main collar ring
-        cylinder(
-            d=collar_od,
-            h=collar_height,
-            center=true
-        );
+        // Solid ring
+        difference()
+        {
+            cylinder(
+                d=collar_od,
+                h=collar_height
+            );
+            
+            cylinder(
+                d=collar_id,
+                h=collar_height
+            );
+        }
     }
 }
 
