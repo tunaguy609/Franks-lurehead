@@ -17,12 +17,12 @@ head_length       = 62;     // nose-to-rear of main head
 max_diameter      = 28;     // maximum OD of head
 leader_bore       = 2.5;    // through-hole for leader wire
 
-min_wall          = 3.0;
-sinker_bore       = max_diameter - 2*min_wall;  // 22 mm — egg-sinker cavity ID
+min_wall          = 5.0;
+sinker_bore       = max_diameter - 2*min_wall;  // 18 mm — egg-sinker cavity ID
 
 // Eye pockets: flat-bottom cylindrical recesses on ±Y sides
 eye_diameter      = 10.25;
-eye_depth         = 2.5;
+eye_depth         = 3.5;
 eye_z             = 43;     // axial station (from nose) to pocket centre
 
 // Skirt spigot (extension): hollow tube with two ramped ridges
