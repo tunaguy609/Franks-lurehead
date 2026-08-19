@@ -18,11 +18,6 @@ leader_bore       = 2.5;
 min_wall          = 3.0;
 sinker_bore       = max_diameter - 2*min_wall;  // 22 mm
 
-// Skirt collar
-collar_od         = 28;    // Outer diameter matches head
-collar_id         = 22;    // Inner bore diameter for egg weight
-collar_length     = 3;     // Collar ring thickness
-
 // Extension tube with external ramps
 extension_length  = 25;    // Total extension length
 tube_od           = 23;    // Outer diameter of tube
@@ -68,37 +63,6 @@ module head_profile()
 
 
 // -----------------------------
-// SKIRT COLLAR
-//
-// Solid ring at the junction between
-// head and extension tube.
-// 28mm OD, 22mm ID, ~3mm thick band.
-// -----------------------------
-module skirt_collar()
-{
-    translate([
-        0,
-        0,
-        head_length
-    ])
-    {
-        difference()
-        {
-            cylinder(
-                d=collar_od,
-                h=collar_length
-            );
-            
-            cylinder(
-                d=tube_id,
-                h=collar_length
-            );
-        }
-    }
-}
-
-
-// -----------------------------
 // EXTERNAL RAMP
 //
 // Ramped shoulder that flares outward for skirt attachment.
@@ -125,15 +89,15 @@ module external_ramp(len)
 // - 0-12mm: First ramp (23mm to 25mm)
 // - 12-13mm: Flat gap (23mm tube only)
 // - 13-25mm: Second ramp (23mm to 25mm)
-// Sits below the collar.
 // Ramps flare outward where skirts rest.
+// Directly attached to head profile (no collar).
 // -----------------------------
 module extension_with_ramps()
 {
     translate([
         0,
         0,
-        head_length + collar_length
+        head_length
     ])
     {
         // Base tube (23mm OD, extends full length)
@@ -156,7 +120,7 @@ module extension_with_ramps()
 }
 
 
-// Central bore through collar and extension
+// Central bore through extension
 module central_bore()
 {
     translate([
@@ -166,7 +130,7 @@ module central_bore()
     ])
         cylinder(
             d=tube_id,
-            h=collar_length + extension_length + 2
+            h=extension_length + 2
         );
 }
 
@@ -179,7 +143,6 @@ module exterior()
     union()
     {
         head_profile();
-        skirt_collar();
         extension_with_ramps();
     }
 }
@@ -196,7 +159,7 @@ module exterior()
 // -----------------------------
 module sinker_cavity()
 {
-    cavity_start = head_length + collar_length + extension_length;
+    cavity_start = head_length + extension_length;
 
     translate([
         0,
@@ -225,7 +188,7 @@ module leader_passage()
     ])
         cylinder(
             d=leader_bore,
-            h=head_length + collar_length + extension_length + 2
+            h=head_length + extension_length + 2
         );
 }
 
