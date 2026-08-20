@@ -69,7 +69,7 @@ module head_profile()
 // Skirt tube profile (attached at head rear)
 // - Starts at z = head_length
 // - 25 mm total length
-// - First section: ramp with hard edges, peaking at 24.5 mm OD
+// - First section: ramp up to 24.5 mm OD, sharp corner, then straight at 23 mm OD
 // - 1 mm gap at peak
 // - Last section: constant 23 mm OD tube
 // -----------------------------
@@ -88,10 +88,9 @@ module skirt_tube_profile()
         polygon([
             [0.0,    z0],
             [r_base, z0],
-            [r_peak, z1],   // peak OD at midpoint — hard edge
-            [r_peak, z1],   // hard edge duplicate to maintain sharpness
-            [r_base, z2],   // returns to base OD by 12 mm — hard edge down
-            [r_base, z3],   // gap of 1 mm
+            [r_peak, z1],   // ramp up to peak
+            [r_peak, z1],   // hard edge — stay at peak
+            [r_base, z3],   // hard edge down to base OD after gap
             [r_base, z4],   // straight tube continues to end
             [0.0,    z4]
         ]);
