@@ -76,7 +76,6 @@ module head_profile()
 module skirt_tube_profile()
 {
     z0 = head_length;
-    z1 = z0 + ramp_length/2;           // peak station
     z2 = z0 + ramp_length;             // end of ramp section
     z3 = z2 + ramp_gap;                // start of straight tube after gap
     z4 = z0 + tube_length;             // tube end
@@ -88,8 +87,7 @@ module skirt_tube_profile()
         polygon([
             [0.0,    z0],
             [r_base, z0],
-            [r_peak, z1],   // ramp up to peak
-            [r_peak, z1],   // hard edge — stay at peak
+            [r_peak, z2],   // ramp linearly up to peak at end of 12mm section
             [r_base, z3],   // hard edge down to base OD after gap
             [r_base, z4],   // straight tube continues to end
             [0.0,    z4]
