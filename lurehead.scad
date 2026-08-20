@@ -1,6 +1,6 @@
 // GREEN MACHINE STYLE OFFSHORE TROLLING LURE HEAD
 // 30 mm maximum OD  |  22 mm sinker cavity
-// No skirt collar/ridge — rear is flat/closed at the main head.
+// Includes 25 mm skirt tube extension at rear.
 //
 // Print orientation: nose down (+Z toward rear / open cavity end).
 // All dimensions in millimeters.
@@ -18,6 +18,12 @@ leader_bore       = 2.5;    // through-hole for leader wire
 
 min_wall          = 5.0;
 sinker_bore       = 21.5;   // sinker cavity ID
+
+// Skirt tube
+tube_length       = 25;     // total skirt tube length
+tube_od           = 23;     // base tube OD
+ramp_length       = 12;     // first section length with OD ramp/bulge
+ramp_peak_od      = 24.5;   // peak OD in ramp section
 
 // Eye pockets: flat-bottom cylindrical recesses on ±Y sides
 eye_diameter      = 10.25;
@@ -58,11 +64,42 @@ module head_profile()
         ]);
 }
 
+// -----------------------------
+// Skirt tube profile (attached at head rear)
+// - Starts at z = head_length
+// - 25 mm total length
+// - First 12 mm: smooth bulge/ramp peaking at 24.5 mm OD
+// - Last 13 mm: constant 23 mm OD tube
+// -----------------------------
+module skirt_tube_profile()
+{
+    z0 = head_length;
+    z1 = z0 + ramp_length/2;           // peak station
+    z2 = z0 + ramp_length;             // end of ramp section
+    z3 = z0 + tube_length;             // tube end
+
+    r_base = tube_od / 2;
+    r_peak = ramp_peak_od / 2;
+
+    rotate_extrude()
+        polygon([
+            [0.0,    z0],
+            [r_base, z0],
+            [r_peak, z1],   // peak OD at midpoint of first 12 mm
+            [r_base, z2],   // returns to base OD by 12 mm
+            [r_base, z3],   // straight 13 mm tube
+            [0.0,    z3]
+        ]);
+}
+
 
 // Combined exterior solid
 module exterior()
 {
-    head_profile();
+    union() {
+        head_profile();
+        skirt_tube_profile();
+    }
 }
 
 
@@ -71,13 +108,14 @@ module exterior()
 // ============================================================
 
 // -----------------------------
-// Leader passage — continuous 2.5 mm bore from nose to rear.
+// Leader passage — continuous 2.5 mm bore from nose through tube end.
 // Extended by 1 mm past each end to guarantee clean cuts.
 // -----------------------------
 module leader_passage()
 {
+    total_length = head_length + tube_length;
     translate([0, 0, -1])
-        cylinder(d=leader_bore, h=head_length + 2);
+        cylinder(d=leader_bore, h=total_length + 2);
 }
 
 
@@ -100,13 +138,14 @@ module cavity_transition()
 
 // -----------------------------
 // Sinker cavity — cylindrical void that accepts an egg sinker.
-// Runs from cavity_end (18 mm from nose) through to the rear face.
+// Runs from cavity_end (18 mm from nose) through head and tube end.
 // Extended by 1 mm past the rear to guarantee a clean cut.
 // -----------------------------
 module sinker_cavity()
 {
+    total_length = head_length + tube_length;
     translate([0, 0, cavity_end])
-        cylinder(d=sinker_bore, h=head_length - cavity_end + 1);
+        cylinder(d=sinker_bore, h=total_length - cavity_end + 1);
 }
 
 
@@ -136,6 +175,6 @@ difference()
 
     leader_passage();       // continuous 2.5 mm through-hole
     cavity_transition();    // flared taper from leader bore to cavity
-    sinker_cavity();        // 21.5 mm egg-sinker void from rear
+    sinker_cavity();        // 21.5 mm egg-sinker void through tube
     eye_pockets();          // side recesses for doll eyes
 }
