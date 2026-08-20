@@ -24,6 +24,7 @@ tube_length       = 25;     // total skirt tube length
 tube_od           = 23;     // base tube OD
 ramp_length       = 12;     // first section length with OD ramp/bulge
 ramp_peak_od      = 24.5;   // peak OD in ramp section
+ramp_gap          = 1.0;    // 1mm gap between ramp peak and straight tube
 
 // Eye pockets: flat-bottom cylindrical recesses on ±Y sides
 eye_diameter      = 10.25;
@@ -68,15 +69,17 @@ module head_profile()
 // Skirt tube profile (attached at head rear)
 // - Starts at z = head_length
 // - 25 mm total length
-// - First 12 mm: smooth bulge/ramp peaking at 24.5 mm OD
-// - Last 13 mm: constant 23 mm OD tube
+// - First section: ramp with hard edges, peaking at 24.5 mm OD
+// - 1 mm gap at peak
+// - Last section: constant 23 mm OD tube
 // -----------------------------
 module skirt_tube_profile()
 {
     z0 = head_length;
     z1 = z0 + ramp_length/2;           // peak station
     z2 = z0 + ramp_length;             // end of ramp section
-    z3 = z0 + tube_length;             // tube end
+    z3 = z2 + ramp_gap;                // start of straight tube after gap
+    z4 = z0 + tube_length;             // tube end
 
     r_base = tube_od / 2;
     r_peak = ramp_peak_od / 2;
@@ -85,10 +88,12 @@ module skirt_tube_profile()
         polygon([
             [0.0,    z0],
             [r_base, z0],
-            [r_peak, z1],   // peak OD at midpoint of first 12 mm
-            [r_base, z2],   // returns to base OD by 12 mm
-            [r_base, z3],   // straight 13 mm tube
-            [0.0,    z3]
+            [r_peak, z1],   // peak OD at midpoint — hard edge
+            [r_peak, z1],   // hard edge duplicate to maintain sharpness
+            [r_base, z2],   // returns to base OD by 12 mm — hard edge down
+            [r_base, z3],   // gap of 1 mm
+            [r_base, z4],   // straight tube continues to end
+            [0.0,    z4]
         ]);
 }
 
